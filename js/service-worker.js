@@ -2,8 +2,8 @@
 
 const CACHE_NAME = 'static-cache-v1';
 const FILES_TO_CACHE = [
-"offline.html",
-"css/bootstrap335.min.css"
+"../offline.html",
+"../css/bootstrap335.min.css"
 ];
 
 console.log('WORKER: executing.');
@@ -47,7 +47,7 @@ console.log(event, event.request.mode);
 		.catch(() => {
 			return caches.open(CACHE_NAME)
 			.then((cache) => {
-				return cache.match("offline.html");
+				return cache.match("../offline.html");
 			});
 		})
 	);
