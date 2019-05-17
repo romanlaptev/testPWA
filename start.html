@@ -34,6 +34,7 @@
 <body>
 	<div class="container">
 
+		<button id="butInstall" aria-label="Install" hidden></button>
 		<div class="page-header">
 			<h1>test  Progressive Web Applications  (PWA)</h1>
 		</div>
@@ -58,6 +59,7 @@ http://prgssr.ru/development/sozdaem-service-worker.html
 		
 	</div><!-- end container -->
 
+<script src="js/install.js"></script>
 	<script>
 var logMsg;
 
@@ -72,7 +74,7 @@ function registerServiceWorker() {
 	if ('serviceWorker' in navigator) {
 	
 		window.addEventListener('load', function() {
-			navigator.serviceWorker.register('service-worker.js').
+			navigator.serviceWorker.register("js/service-worker.js").
 			
 				then(function(reg) {
 					logMsg = "ServiceWorker registration successful with scope: " + reg.scope;
