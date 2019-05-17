@@ -63,7 +63,6 @@ console.log('User dismissed the A2HS prompt', choice);
 
 // CODELAB: Add event listener for appinstalled event
 window.addEventListener('appinstalled', logAppInstalled);
-console.log('Weather App was installed.', evt);
 /**
  * Event handler for appinstalled event.
  *   Log the installation to analytics or save the event somehow.
@@ -71,6 +70,6 @@ console.log('Weather App was installed.', evt);
  * @param {Event} evt
  */
 function logAppInstalled(evt) {
-  // CODELAB: Add code to log the event
-
+// CODELAB: Add code to log the event
+console.log('Weather App was installed.', evt);
 }
