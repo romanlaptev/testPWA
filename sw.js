@@ -1,6 +1,6 @@
 "use strict";
+const CACHE_NAME = "v1";
 /*
-const CACHE_NAME = "static-cache-v1";
 const FILES_TO_CACHE = [
 //"offline.html",
 //"pages/",
@@ -27,7 +27,7 @@ console.log("WORKER: install event in progress.", event);
 
 this.addEventListener("fetch", function(event) {
 console.log("WORKER: fetch event in progress.", event.request.url);
-console.log(event, event.request.mode);
+console.log(event, event.request.mode, event.request);
 	
 	var response;
 	//event.respondWith( 
@@ -45,7 +45,7 @@ console.log(event, event.request.mode);
 			return fetch(event.request);			
 		})
 */
-/*
+
 		fetch(event.request)
 		.catch(() => {
 			return caches.open(CACHE_NAME)
@@ -53,7 +53,6 @@ console.log(event, event.request.mode);
 				return cache.match("offline.html");
 			});
 		})
-*/
 
 /*
 		// ищем запрашиваемый ресурс в хранилище кэша
