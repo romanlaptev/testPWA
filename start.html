@@ -84,9 +84,7 @@ function registerServiceWorker() {
 	if ('serviceWorker' in navigator) {
 	
 		window.addEventListener('load', function() {
-			navigator.serviceWorker.register("service-worker.js").
-			
-				then(function(reg) {
+			navigator.serviceWorker.register("service-worker.js").then(function(reg) {
 					logMsg = "ServiceWorker registration successful with scope: " + reg.scope;
 _alert( logMsg, "success" );
 console.log(reg);
@@ -96,7 +94,7 @@ logMsg="Service worker installing";
 _alert( logMsg, "info" );
 					}
 					if(reg.waiting) {
-logMsg="Service worker installed";
+logMsg="Service worker waiting";
 _alert( logMsg, "info" );
 					}
 					if(reg.active) {
@@ -110,9 +108,9 @@ _alert( logMsg, "info" );
 logMsg="ServiceWorker registration failed";
 _alert( logMsg, "error" );
 console.log(err);
-				}).
+				})
 				
-				catch(function(err) {
+				.catch(function(err) {
 console.log(err)
 				});
 		});
