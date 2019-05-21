@@ -75,7 +75,7 @@ console.log("TEST", cachedResponse);
 
 this.addEventListener("activate", function(event) {
 console.log("WORKER: activate event in progress.", event);
-
+/*
 	event.waitUntil(
 		caches.keys().then((keyList) => {
 			return Promise.all( keyList.map(
@@ -88,4 +88,5 @@ console.log("WORKER: activate event in progress.", event);
 			);
 		})
 	);
+*/
 });//end event
