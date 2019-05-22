@@ -159,8 +159,8 @@ console.log(err);
 	}//end event
 
 
-	var btn_put_cache = document.querySelector("#btn-put-cache");
-	btn_put_cache.onclick = function(e){
+	var btn_add_all_cache = document.querySelector("#btn-add-all-cache");
+	btn_add_all_cache.onclick = function(e){
 		if(!support){
 			return false;
 		}
@@ -174,7 +174,9 @@ func.logAlert( logMsg, "warning" );
 		caches.open(cacheName).then(function( cache ){// add all caching resource URLs
 		
 			cache.addAll( FILES_TO_CACHE ).then(function(){
-console.log("[ServiceWorker] Pre-caching offline recources", arguments);
+logMsg="Pre-caching offline recources: " + FILES_TO_CACHE.toString();
+func.logAlert( logMsg, "success" );
+console.log(FILES_TO_CACHE.toString() );
 				_getKeys( cacheName );
 			});
 			//return _cache;
@@ -255,6 +257,95 @@ func.logAlert( logMsg, "warning" );
 			});
 		});
 	}//end event
+
+
+	var btn_addKey = document.querySelector("#btn-add-key");
+	btn_addKey.onclick = function(e){
+		if(!support){
+			return false;
+		}
+		var cacheName = cacheNameField.value;
+//console.log(cacheName);
+		if( !cacheName || cacheName.length===0 ){
+logMsg="<b>Object cache name</b> is empty....";
+func.logAlert( logMsg, "warning" );
+			return false;
+		}
+		
+		var url = cacheKeyField.value;
+//console.log(cacheKey);
+		if( !url || url.length===0 ){
+logMsg="<b>URL</b> is empty (field cache key)....";
+func.logAlert( logMsg, "warning" );
+			return false;
+		}
+
+		caches.open( cacheName ).then(function( cache ){
+			cache.add( url ).then(function( response ) {//https://developer.mozilla.org/ru/docs/Web/API/Cache/add			
+console.log( response );
+logMsg="<b>URL " +url+ "</b> loaded and added to cache " +cacheName;
+func.logAlert( logMsg, "success" );
+			});
+		});
+	}//end event
+
+
+	var btn_test = document.querySelector("#btn-test");
+	btn_test.onclick = function(e){
+		if(!support){
+			return false;
+		}
+		var cacheName = cacheNameField.value;
+//console.log(cacheName);
+		if( !cacheName || cacheName.length===0 ){
+logMsg="<b>Object cache name</b> is empty....";
+func.logAlert( logMsg, "warning" );
+			return false;
+		}
+		
+		cacheKeyField.value = "pages/_star-wars-logo.jpg";//url for load image
+		var key = "pages/star-wars-logo.jpg";//cache image under different name
+		
+		var url = cacheKeyField.value;
+//console.log(url);
+
+		caches.open( cacheName ).then(function( cache ){
+			
+			fetch( url ).then(function (response){
+console.log( response );
+				if (!response.ok) {
+					throw new TypeError('bad response status');
+				} else {
+logMsg="Image by url "+url+" cached under name " + key+", reload page and see image....";
+func.logAlert( logMsg, "success" );
+				}
+				return cache.put( key, response);
+			})				
+
+		});
+	}//end event
+
+
+	var btn_swUnReg = document.querySelector("#btn-sw-unregister");
+	btn_swUnReg.onclick = function(e){
+		navigator.serviceWorker.getRegistrations().then(function(registrations) {
+console.log( registrations );
+			 // for(let registration of registrations) {
+			  // registration.unregister()
+			// }//next
+		})
+	}//end event
+
+	var btn_swUpd = document.querySelector("#btn-sw-update");
+	btn_swUpd.onclick = function(e){
+		navigator.serviceWorker.getRegistrations().then(function(registrations) {
+console.log( registrations );
+			 // for(let registration of registrations) {
+			  // registration.unregister()
+			// }//next
+		})
+	}//end event
+
 
 }//end defineEvents()
 

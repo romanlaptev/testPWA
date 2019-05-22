@@ -59,13 +59,17 @@ console.log(event, event.request.mode, event.request);
 		// ищем запрашиваемый ресурс в хранилище кэша
 		caches.match(event.request).then(function(cachedResponse) {
 console.log("TEST", cachedResponse);
+
 			// выдаём кэш, если он есть
 			if (cachedResponse) {
 				return cachedResponse;
 			}
 
 			// иначе запрашиваем из сети как обычно
-			return fetch(event.request);
+			return fetch(event.request).catch(function(res){
+console.log( res );
+			});
+			
 		})
 
 	);

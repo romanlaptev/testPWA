@@ -60,22 +60,70 @@ margin: 0;
 		<div class="panel">
 			<div class="panel-body">
 				<p>object cache name: <input id="cache-name" type="text" class="form-control" value="" autocomplete="off"/></p>
-<p>cache key: <input id="cache-key" type="text" class="form-control" value="css/bootstrap335.min.css" autocomplete="off"/></p>
+<p>cache key: <input id="cache-key" type="text" class="form-control" value="" autocomplete="off"/></p>
+<pre>
+test_service_worker.html
+offline.html
+css/bootstrap335.min.css
+js/functions.js
+js/main.js
+pages/star-wars-logo.jpg
+pages/_star-wars-logo.jpg
+</pre>
 			</div>
 			<div class="panel-body">
-				<button id="btn-put-cache" class="btn btn-info">put resources into object cache</button>
-				<button id="btn-list-caches" class="btn btn-primary">list cache objects</button>
-				<button id="btn-delete-cache" class="btn btn-danger">delete cache, CacheStorage.delete()</button>
+				<button id="btn-sw-update" class="btn btn-primary">update service worker</button>
+				<button id="btn-sw-unregister" class="btn btn-danger">unregister service worker</button>
+<pre>
+https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/update
+https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/unregister
+</pre>				
 			</div>
+
+			<div class="panel-body">
+				<button id="btn-list-caches" class="btn btn-primary">list cache objects</button>
+			</div>
+			
+			<div class="panel-body">
+				<button id="btn-delete-cache" class="btn btn-danger">delete cache by name</button>
+<a href="https://developer.mozilla.org/ru/docs/Web/API/CacheStorage/delete" target="_blank">developer.mozilla.org, CacheStorage.delete()</a>
+			</div>
+			
 			<div class="panel-body">
 				<button id="btn-list-cache-keys" class="btn btn-primary">list cache keys, CacheStorage.keys()</button>
-				<button id="btn-delete-key" class="btn btn-danger">delete key into object cache</button>
-				<p>
-					<button id="btn-match-key" class="btn btn-info">cache.match()</button>
-					<small>find key into object cache</small>
-				</p>
 			</div>
-		</div>
+			<div class="panel-body">
+				<button id="btn-add-key" class="btn btn-success">add one key into object cache</button>
+				<button id="btn-delete-key" class="btn btn-danger">delete one key into object cache</button>
+			</div>
+			
+			<div class="panel-body">
+					<button id="btn-match-key" class="btn btn-default">cache.match()</button>
+					<small>find key into object cache</small>
+			</div>
+
+			<div class="panel-body">
+				<button id="btn-add-all-cache" class="btn btn-success">add resources into object cache</button>
+<a href="https://developer.mozilla.org/ru/docs/Web/API/Cache/addAll" target="_blank">developer.mozilla.org, cache.addAll()</a>
+			</div>
+			
+		</div><!-- end panel -->
+		
+		<div class="panel panel-primary">
+			<div class="panel-heading">
+					<h2>TEST cache</h2>
+<p>load image 'pages/_star-wars-logo.jpg' and add to the cache as 'pages/star-wars-logo.jpg'</p>
+			<div>
+			<div class="panel-body">
+				<div  class="thumbnail col-xs-6 colsm-6 col-md-6 col-lg-6">
+					<img src="pages/star-wars-logo.jpg" alt="add to cache 'pages/_star-wars-logo.jpg'">
+				</div>
+				<div class="col-xs-6 colsm-6 col-md-6 col-lg-6">
+					<button id="btn-test" class="btn btn-lg btn-warning">run TEST</button>
+				</div>
+			</div>
+		</div><!-- end panel -->
+		
 <!--
 Cache.match(request, options)
     Возвращает Promise, который успешно завершается с нахождением первого совпадения для данного запроса в объекте Cache.
