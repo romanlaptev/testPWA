@@ -335,14 +335,44 @@ console.log( registrations );
 	}//end event
 
 	var btn_swUnReg = document.querySelector("#btn-sw-unregister");
+	var field_swUrl = document.querySelector("#field-sw-url");
 	btn_swUnReg.onclick = function(e){
 		navigator.serviceWorker.getRegistrations().then(function(registrations) {
 console.log( registrations );
+
+			var url = field_swUrl.value;
+			if( !url || url.length===0 ){
+logMsg="<b>service worker URL</b> is empty...";
+func.logAlert( logMsg, "warning" );
+				return false;
+			}
+			
+			var result = false;
 			 for(let registration of registrations) {
-console.log( registration );
-			  // registration.unregister()
+//console.log( registration.active.scriptURL, url, registration.active.scriptURL === url);
+				if( registration.active.scriptURL === url ){
+					result = true;
+					registration.unregister().then( function(res) {
+console.log(res);						
+						if( res){
+logMsg="service worker by URL:<b> "+registration.active.scriptURL+"</b> was unregister...";
+func.logAlert( logMsg, "success" );
+						} else {
+logMsg="service worker by URL:<b> "+registration.active.scriptURL+"</b> was NOT unregister...";
+func.logAlert( logMsg, "error" );
+						}
+						
+					});
+					break;
+				}
 			}//next
-		})
+			
+			if(!result){
+logMsg="service worker by URL:<b>"+url+"</b> NOT found...";
+func.logAlert( logMsg, "error" );
+			}
+			
+		});
 	}//end event
 
 	var btn_swUpd = document.querySelector("#btn-sw-update");
@@ -429,14 +459,14 @@ func.logAlert( logMsg, "warning" );
 
 function _listSW( registrations ){
 func.log("<h4>Servise workers list</h4>");
-	var html = "<ul class='list-unstyled'>{{list}}</ul>";
+	var html = "<div class='panel panel-primary'>{{list}}</div>";
 	var listHtml = "";
 	 for(var n=0; n < registrations.length; n++) {
 		 var registration = registrations[n];
 		var _scopeHtml = "<p><small>scope:</small> " + registration.scope + "</p>";
 		var _stateHtml = "<p><small>state:</small> " + registration.active.state + "</p>";
 		var _urlHtml = "<p><small>scriptURL:</small> " + registration.active.scriptURL + "</p>";
-		listHtml += "<li class='list-group-item'>" + _scopeHtml + _stateHtml + _urlHtml+"</li>";
+		listHtml += "<div class='panel-body'>" + _scopeHtml + _stateHtml + _urlHtml+"</div>";
 	}//next
 	html = html.replace("{{list}}", listHtml);
 func.log(html);
