@@ -317,7 +317,7 @@ console.log( response );
 					throw new TypeError('bad response status');
 				} else {
 logMsg="Image by url "+url+" cached under name " + key+", reload page and see image....";
-func.logAlert( logMsg, "success" );
+func.log( "<p class='alert alert-success'>"+logMsg+"</p>", "info" );
 				}
 				return cache.put( key, response);
 			})				
@@ -326,13 +326,22 @@ func.logAlert( logMsg, "success" );
 	}//end event
 
 
+	var btn_swList = document.querySelector("#btn-sw-list");
+	btn_swList.onclick = function(e){
+		navigator.serviceWorker.getRegistrations().then(function(registrations) {
+console.log( registrations );
+			_listSW( registrations );
+		})
+	}//end event
+
 	var btn_swUnReg = document.querySelector("#btn-sw-unregister");
 	btn_swUnReg.onclick = function(e){
 		navigator.serviceWorker.getRegistrations().then(function(registrations) {
 console.log( registrations );
-			 // for(let registration of registrations) {
+			 for(let registration of registrations) {
+console.log( registration );
 			  // registration.unregister()
-			// }//next
+			}//next
 		})
 	}//end event
 
@@ -344,6 +353,21 @@ console.log( registrations );
 			  // registration.unregister()
 			// }//next
 		})
+		
+/*
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw-test/sw.js', {scope: 'sw-test'}).then(function(registration) {
+    // registration worked
+    console.log('Registration succeeded.');
+    button.onclick = function() {
+      registration.update();
+    }
+  }).catch(function(error) {
+    // registration failed
+    console.log('Registration failed with ' + error);
+  });
+};
+*/		
 	}//end event
 
 
@@ -401,3 +425,21 @@ func.logAlert( logMsg, "warning" );
 			});
 	});
 }//end _getKeys()
+
+
+function _listSW( registrations ){
+func.log("<h4>Servise workers list</h4>");
+	var html = "<ul class='list-unstyled'>{{list}}</ul>";
+	var listHtml = "";
+	 for(var n=0; n < registrations.length; n++) {
+		 var registration = registrations[n];
+		var _scopeHtml = "<p><small>scope:</small> " + registration.scope + "</p>";
+		var _stateHtml = "<p><small>state:</small> " + registration.active.state + "</p>";
+		var _urlHtml = "<p><small>scriptURL:</small> " + registration.active.scriptURL + "</p>";
+		listHtml += "<li class='list-group-item'>" + _scopeHtml + _stateHtml + _urlHtml+"</li>";
+	}//next
+	html = html.replace("{{list}}", listHtml);
+func.log(html);
+	
+}//end _listSW()
+
