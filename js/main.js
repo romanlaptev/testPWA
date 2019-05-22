@@ -35,6 +35,12 @@ if( window.location.protocol !== "https:"){
 
 
 registerServiceWorker();
+
+var field_swUrl = document.querySelector("#field-sw-url");
+var btn_swList = document.querySelector("#btn-sw-list");
+var btn_swUnReg = document.querySelector("#btn-sw-unregister");
+var btn_swUpd = document.querySelector("#btn-sw-update");
+
 defineEvents();
 
 function registerServiceWorker() {
@@ -326,7 +332,7 @@ func.log( "<p class='alert alert-success'>"+logMsg+"</p>", "info" );
 	}//end event
 
 
-	var btn_swList = document.querySelector("#btn-sw-list");
+
 	btn_swList.onclick = function(e){
 		navigator.serviceWorker.getRegistrations().then(function(registrations) {
 console.log( registrations );
@@ -334,8 +340,6 @@ console.log( registrations );
 		})
 	}//end event
 
-	var btn_swUnReg = document.querySelector("#btn-sw-unregister");
-	var field_swUrl = document.querySelector("#field-sw-url");
 	btn_swUnReg.onclick = function(e){
 		navigator.serviceWorker.getRegistrations().then(function(registrations) {
 console.log( registrations );
@@ -375,29 +379,36 @@ func.logAlert( logMsg, "error" );
 		});
 	}//end event
 
-	var btn_swUpd = document.querySelector("#btn-sw-update");
 	btn_swUpd.onclick = function(e){
 		navigator.serviceWorker.getRegistrations().then(function(registrations) {
 console.log( registrations );
-			 // for(let registration of registrations) {
-			  // registration.unregister()
-			// }//next
+			var url = field_swUrl.value;
+			if( !url || url.length===0 ){
+logMsg="<b>service worker URL</b> is empty...";
+func.logAlert( logMsg, "warning" );
+				return false;
+			}
+			
+			var result = false;
+			 for(let registration of registrations) {
+//console.log( registration.active.scriptURL, url, registration.active.scriptURL === url);
+				if( registration.active.scriptURL === url ){
+					result = true;
+					registration.update().then( function(res) {
+console.log(res);						
+logMsg="service worker by URL:<b> "+registration.active.scriptURL+"</b> was updated...";
+func.logAlert( logMsg, "success" );
+					});
+					break;
+				}
+			}//next
+			
+			if(!result){
+logMsg="service worker by URL:<b>"+url+"</b> NOT found...";
+func.logAlert( logMsg, "error" );
+			}
 		})
 		
-/*
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw-test/sw.js', {scope: 'sw-test'}).then(function(registration) {
-    // registration worked
-    console.log('Registration succeeded.');
-    button.onclick = function() {
-      registration.update();
-    }
-  }).catch(function(error) {
-    // registration failed
-    console.log('Registration failed with ' + error);
-  });
-};
-*/		
 	}//end event
 
 
