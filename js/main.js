@@ -1,10 +1,10 @@
 if ( navigator.onLine ) {
-	alert('online');
+	alert("navigator.onLine" + navigator.onLine);
 } else {
-	alert('offline');
+	alert("navigator.onLine" + navigator.onLine);
 }
-window.addEventListener("offline", function(e) {alert("offline");});
-window.addEventListener("online", function(e) {alert("online");});
+window.addEventListener("offline", function(e) {alert("navigator.onLine" + navigator.onLine);});
+window.addEventListener("online", function(e) {alert("navigator.onLine" + navigator.onLine);});
 
 var func = sharedFunc();
 //console.log("func:", func);
