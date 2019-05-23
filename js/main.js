@@ -1,3 +1,11 @@
+if ( navigator.onLine ) {
+	alert('online');
+} else {
+	alert('offline');
+}
+window.addEventListener("offline", function(e) {alert("offline");});
+window.addEventListener("online", function(e) {alert("online");});
+
 var func = sharedFunc();
 //console.log("func:", func);
 
