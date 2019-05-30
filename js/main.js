@@ -468,21 +468,18 @@ function _getListCaches(){
 		caches.keys().then( function(keyList) {
 console.log( keyList);
 			if( keyList.length > 0){
-				
 func.log("<h4>List cache objects</h4>");
-			var html = "<ul class='list-unstyled'>{{list}}</ul>";
-			var listHtml = "";
-			for( var n = 0; n < keyList.length; n++){
-				listHtml += "<li class='list-group-item'>" + keyList[n] + "</li>";					
-			}//next
-			html = html.replace("{{list}}", listHtml);
+				var html = "<ul class='list-unstyled'>{{list}}</ul>";
+				var listHtml = "";
+				for( var n = 0; n < keyList.length; n++){
+					listHtml += "<li class='list-group-item'>" + keyList[n] + "</li>";					
+				}//next
+				html = html.replace("{{list}}", listHtml);
 func.log(html);
-					// return Promise.all( keyList.map( function (key) {
-		// console.log(key);
-								// //return caches.delete(key);
-						// })
-					// );
-	
+
+				var cacheNameField = document.querySelector("#cache-name");
+				cacheNameField.value = keyList[0];
+
 			} else {
 logMsg="not found cache objects...";
 func.logAlert( logMsg, "warning" );
