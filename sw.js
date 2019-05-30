@@ -56,7 +56,6 @@ console.log("-- event.request.mode:", event.request.mode);
 	
 	//var response;
 
-
 	//https://habr.com/ru/post/279291/
 	event.respondWith( 
 		caches.match( event.request )
@@ -74,7 +73,6 @@ console.log("-- event.request.mode:", event.request.mode);
 			})
 	);
 
-
 /*
 	//https://habr.com/ru/company/2gis/blog/345552/
 	//cache-only-v1
@@ -90,33 +88,61 @@ console.log("-- event.request.mode:", event.request.mode);
 	);
 */
 
-
-	//event.respondWith( 
-/*	
-		caches.match( event.request ).catch(function() {
-			return fetch( event.request );
-		}).then( function(r){
-			response = r;
-			caches.open( CACHE_NAME ).	then( function(cache){
-				cache.put( event.request, response );
-			});
-			return response.clone();
-		}).catch( function(){
-			//return caches.match("offline.html");
-			return fetch(event.request);			
-		})
-*/
 /*
-		fetch(event.request)
+//var MAX_AGE = 86400000;
+//https://habr.com/ru/post/279291/
+    event.respondWith(
+        // ищем запрошенный ресурс среди закэшированных
+        caches.match(event.request).then(function(cachedResponse) {
+            var lastModified, fetchRequest;
+
+            // если ресурс есть в кэше
+            if (cachedResponse) {
+                // получаем дату последнего обновления
+                lastModified = new Date(cachedResponse.headers.get('last-modified'));
+                // и если мы считаем ресурс устаревшим
+                if (lastModified && (Date.now() - lastModified.getTime()) > MAX_AGE) {
+                    
+                    fetchRequest = event.request.clone();
+                    // создаём новый запрос
+                    return fetch(fetchRequest).then(function(response) {
+                        // при неудаче всегда можно выдать ресурс из кэша
+                        if (!response || response.status !== 200) {
+                            return cachedResponse;
+                        }
+                        // обновляем кэш
+                        caches.open(CACHE_NAME).then(function(cache) {
+                            cache.put(event.request, response.clone());
+                        });
+                        // возвращаем свежий ресурс
+                        return response;
+                    }).catch(function() {
+                        return cachedResponse;
+                    });
+                }
+                return cachedResponse;
+            }
+
+            // запрашиваем из сети как обычно
+            return fetch(event.request);
+        })
+    );
+*/
+
+//---------------------------------------
+/*
+	event.respondWith( 
+		fetch( event.request )
 		.catch(() => {
 			return caches.open(CACHE_NAME)
 			.then((cache) => {
 				return cache.match("offline.html");
 			});
 		})
+	);
 */
 
-
+	//event.respondWith( 
 /*
 //https://codelabs.developers.google.com/codelabs/your-first-pwapp/#5
 		caches.open(DATA_CACHE_NAME).then((cache) => {
