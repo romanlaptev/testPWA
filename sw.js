@@ -50,9 +50,9 @@ self.addEventListener("install", (event) => {
 //self.addEventListener(......
 this.addEventListener("fetch", function(event) {
 console.log("WORKER: fetch event in progress.", event.request.url);
-console.log(event);
-console.log("-- event.request:", event.request);
-console.log("-- event.request.mode:", event.request.mode);
+//console.log(event);
+//console.log("-- event.request:", event.request);
+//console.log("-- event.request.mode:", event.request.mode);
 	
 	//var response;
 
@@ -60,9 +60,11 @@ console.log("-- event.request.mode:", event.request.mode);
 	event.respondWith( 
 		caches.match( event.request )
 			.then(function(cachedResponse){// ищем запрашиваемый ресурс в хранилище кэша
-	console.log("-- cachedResponse:", cachedResponse);
 
 			if (cachedResponse) {// выдаём кэш, если он есть
+				var lastModified = new Date( cachedResponse.headers.get("last-modified") );
+console.log("-- cachedResponse:", cachedResponse.url, lastModified);
+			
 				return cachedResponse;
 			}
 
