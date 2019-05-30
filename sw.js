@@ -38,7 +38,7 @@ console.log("WORKER: install event in progress.", event);
 
 });//end event
 */
-self.addEventListener('install', (event) => {
+self.addEventListener("install", (event) => {
 	event.waitUntil(
 		caches.open( CACHE_NAME ).then( (cache) => cache.addAll( FILES_TO_CACHE) )
 		// `skipWaiting()` необходим, потому что мы хотим активировать SW
@@ -54,8 +54,44 @@ console.log(event);
 console.log("-- event.request:", event.request);
 console.log("-- event.request.mode:", event.request.mode);
 	
-	var response;
+	//var response;
+
+
+	//https://habr.com/ru/post/279291/
 	event.respondWith( 
+		caches.match( event.request )
+			.then(function(cachedResponse){// ищем запрашиваемый ресурс в хранилище кэша
+	console.log("-- cachedResponse:", cachedResponse);
+
+			if (cachedResponse) {// выдаём кэш, если он есть
+				return cachedResponse;
+			}
+
+			// // иначе запрашиваем из сети как обычно
+			// return fetch(event.request).catch(function(res){
+	// console.log( res );
+			// });
+			})
+	);
+
+
+/*
+	//https://habr.com/ru/company/2gis/blog/345552/
+	//cache-only-v1
+// Открываем наше хранилище кэша (CacheStorage API), выполняем поиск запрошенного ресурса.
+// Обратите внимание, что в случае отсутствия соответствия значения Promise выполнится успешно, 
+//но со значением `undefined`
+	event.respondWith( 
+		caches.open(CACHE_NAME).then(
+			(cache) => cache.match( request ).then( 
+					(matching) =>	matching || Promise.reject("no-match")
+			)
+		)
+	);
+*/
+
+
+	//event.respondWith( 
 /*	
 		caches.match( event.request ).catch(function() {
 			return fetch( event.request );
@@ -80,24 +116,6 @@ console.log("-- event.request.mode:", event.request.mode);
 		})
 */
 
-/*
-//https://habr.com/ru/post/279291/
-		// ищем запрашиваемый ресурс в хранилище кэша
-		caches.match(event.request).then(function(cachedResponse) {
-console.log("-- cachedResponse:", cachedResponse);
-
-			// выдаём кэш, если он есть
-			if (cachedResponse) {
-				return cachedResponse;
-			}
-
-			// иначе запрашиваем из сети как обычно
-			return fetch(event.request).catch(function(res){
-console.log( res );
-			});
-			
-		})
-*/
 
 /*
 //https://codelabs.developers.google.com/codelabs/your-first-pwapp/#5
@@ -123,8 +141,6 @@ console.log( res );
 			// return fromCache( event.request );
 		// })
 	
-		//cache-only-v1
-		fromCache(event.request)
 		
 		//cache-and-update-v1
 		// при событии fetch, мы используем кэш, и только потом обновляем его данным с сервера
@@ -139,7 +155,7 @@ console.log( res );
 		// Если она не отработает корректно, то используейте `Embedded fallback`.
 		//networkOrCache(event.request).catch( () => useFallback() )
 		
-	);//end respondWith
+	//);//end respondWith
 	
 	//cache-and-update-v1
 	// `waitUntil()` нужен, чтобы предотвратить прекращение работы worker'a до того как кэш обновиться.
@@ -197,6 +213,7 @@ function fromNetwork(request, _TIMEOUT) {
 	});
 }//end
 
+/*
 function fromCache(request) {
 // Открываем наше хранилище кэша (CacheStorage API), выполняем поиск запрошенного ресурса.
 // Обратите внимание, что в случае отсутствия соответствия значения Promise выполнится успешно, 
@@ -206,7 +223,9 @@ function fromCache(request) {
 			matching || Promise.reject("no-match")
 	));
 }//end
+*/
 
+//----------------------------------------------------------
 function updateCache(request) {
 	return caches.open(CACHE_NAME).then( (cache) =>
 		fetch(request).then( (response) =>
