@@ -23,7 +23,8 @@ const FILES_TO_CACHE = [
 //"pages/gallery/snowTroopers.jpg",
 "css/bootstrap335.min.css",
 "js/functions.js",
-"js/main.js"
+"js/main.js",
+"favicon.ico"
 ];
 
 /*
@@ -68,10 +69,11 @@ console.log("-- cachedResponse:", cachedResponse.url, lastModified);
 				return cachedResponse;
 			}
 
-			// // иначе запрашиваем из сети как обычно
-			// return fetch(event.request).catch(function(res){
-	// console.log( res );
-			// });
+				// иначе запрашиваем из сети как обычно
+				return fetch(event.request).catch(function(res){
+console.log( res );
+				});
+
 			})
 	);
 
