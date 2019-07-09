@@ -3,6 +3,7 @@ var func = sharedFunc();
 
 var support = false;
 var notificationSupport=false;
+var pushSupport=false;
 var swSupport=false;
 
 var logMsg;
@@ -23,6 +24,16 @@ logMsg = "window.Notification support: " + test;
 if( test ){
 	func.logAlert(logMsg, "success");
 	notificationSupport=true;
+} else {
+	func.logAlert(logMsg, "error");
+}
+
+//--------------------------
+var test =  typeof window.PushManager !== "undefined";
+logMsg = "window.PushManager support: " + test;
+if( test ){
+	func.logAlert(logMsg, "success");
+	pushSupport=true;
 } else {
 	func.logAlert(logMsg, "error");
 }
