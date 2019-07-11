@@ -101,7 +101,12 @@ func.logAlert(logMsg, "success");
 					var img = 'favicon.ico';
 					var timeMs = 18000;
 					var text = "This notification will be closed after "+ timeMs / 1000 +" sec....";
-					var notification = new Notification("Title!", { body: text, icon: img });	
+					var notification = new Notification("Title!", { 
+						tag: "note1",
+						body: text, 
+						dir: "auto", 
+						icon: img 
+					});	
 					
 					notification.onshow = function() {
 logMsg = "notification.onshow....";
