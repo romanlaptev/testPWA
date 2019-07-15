@@ -1,22 +1,12 @@
 var func = sharedFunc();
 //console.log("func:", func);
 
-var support=false;
-var cacheSupport=false;
+var support = false;
+var notificationSupport=false;
+var pushSupport=false;
 var swSupport=false;
 
-const FILES_TO_CACHE = [
-"css/bootstrap335.min.css"//,
-//"pages/",
-//"pages/index.html",
-//"pages/style.css",
-//"pages/app.js",
-//"pages/image-list.js",
-//"pages/star-wars-logo.jpg",
-//"pages/gallery/bountyHunters.jpg",
-//"pages/gallery/myLittleVader.jpg",
-//"pages/gallery/snowTroopers.jpg"
-];
+//var isPushEnabled = false;
 
 var logMsg;
 logMsg = navigator.userAgent;
@@ -29,25 +19,28 @@ if ( navigator.onLine ) {
 } else {
 	func.logAlert(logMsg, "danger");
 }
-//--------------------------
 
-var test =  typeof window.Promise !== "undefined";
-logMsg = "window.Promise support: " + test;
+//--------------------------
+var test =  typeof window.Notification !== "undefined";
+logMsg = "window.Notification support: " + test;
 if( test ){
 	func.logAlert(logMsg, "success");
+	notificationSupport=true;
 } else {
 	func.logAlert(logMsg, "error");
 }
 
-test =  "caches" in window;
-logMsg = "CacheStorage API, window.caches support: " + test;
-if (test) {
-	cacheSupport=true;
+//--------------------------
+var test =  typeof window.PushManager !== "undefined";
+logMsg = "window.PushManager support: " + test;
+if( test ){
 	func.logAlert(logMsg, "success");
+	pushSupport=true;
 } else {
 	func.logAlert(logMsg, "error");
 }
 
+//--------------------------
 test = "serviceWorker" in navigator;
 logMsg = "navigator.serviceWorker support: " + test;
 if (test) {
@@ -57,36 +50,155 @@ if (test) {
 	func.logAlert(logMsg, "error");
 }
 
-if( cacheSupport && swSupport){
-	support = true;
-}
 
+//--------------------------
 if( window.location.protocol !== "https:"){
 	logMsg = "error,  serviceWorker requires 'https:' protocol....";
 	logMsg += "but used: " + window.location.protocol;
 	func.logAlert(logMsg, "error");
-	support = false;
+} else {
+	support = true;
 }
-//console.log(support);
 
-if( support ){
-	registerServiceWorker();
+
+defineEvents();
+
 	
-	var field_swUrl = document.querySelector("#field-sw-url");
-	var btn_swList = document.querySelector("#btn-sw-list");
-	var btn_swUnReg = document.querySelector("#btn-sw-unregister");
-	var btn_swUpd = document.querySelector("#btn-sw-update");
 
-	defineEvents();
-}
+function defineEvents(){
+
+	var btn_clear_log = document.querySelector("#btn-clear-log");
+	btn_clear_log.onclick = function(){
+		log.innerHTML = "";
+	};
+
+	if( !support ){
+		return;
+	}
+
+	var btn_notify_req = document.querySelector("#btn-notification-request");
+	btn_notify_req.onclick = function(){
+
+	if( !notificationSupport ){
+		var test =  typeof window.Notification !== "undefined";
+		logMsg = "window.Notification support: " + test;
+func.logAlert(logMsg, "error");
+		return;
+	}
+		
+		//Notification.requestPermission().then(function(result) {
+//console.log(result);
+		//});
+		
+		Notification.requestPermission(function(result) {
+console.log(result);
+console.log("Notification.permission: ", Notification.permission);
+
+			switch( result ){
+				
+				case "granted":
+logMsg = "The user has explicitly declined permission to show notifications.";
+func.logAlert(logMsg, "success");
+					//var notification = new Notification("Hi there!");
+					var img = 'favicon.ico';
+					var timeMs = 18000;
+					var text = "This notification will be closed after "+ timeMs / 1000 +" sec....";
+					var notification = new Notification("Title!", { 
+						tag: "note1",
+						body: text, 
+						dir: "auto", 
+						icon: img 
+					});	
+					
+					notification.onshow = function() {
+logMsg = "notification.onshow....";
+func.logAlert(logMsg, "info");
+					};
+					
+					notification.onclose = function() {
+logMsg = "notification.onclose....";
+func.logAlert(logMsg, "info");
+					};
+					
+					notification.onerror = function() {
+consol.log(arguments);						
+logMsg = "notification.onerror....";
+func.logAlert(logMsg, "error");
+					};
+
+					notification.onclick = function(event) {
+						event.preventDefault(); // prevent the browser from focusing the Notification's tab
+						window.open('http://www.mozilla.org', '_blank');
+logMsg = "notification.onclick....";
+func.logAlert(logMsg, "info");
+					};
+					
+					setTimeout( notification.close.bind(notification), timeMs );
+					
+				break;
+				
+				case "denied":
+logMsg = "The user has granted permission to display notifications, after having been asked previously.";
+func.logAlert(logMsg, "warning");
+				break;
+				
+				case "default":
+logMsg = "The user hasn't been asked for permission yet, so notifications won't be displayed....";
+func.logAlert(logMsg, "info");
+				break;
+				
+				default:
+				break;
+			}//end switch
 
 
+		});
+		
+	};//end event
+
+
+//===================================================== PUSH API
+/*
+		var btn_push_reg = document.querySelector("#btn-push-reg");
+		btn_push_reg.onclick = function(){
+
+		if( !swSupport ){
+			var test = "serviceWorker" in navigator;
+			logMsg = "navigator.serviceWorker support: " + test;
+			func.logAlert(logMsg, "error");
+			return;
+		}
+		registerServiceWorker();
+	};//end event
+
+	var btn_push_subscribe = document.querySelector("#btn-push-subscribe");
+	btn_push_subscribe.onclick = function(){
+
+		// if( !swSupport ){
+			// var test = "serviceWorker" in navigator;
+			// logMsg = "navigator.serviceWorker support: " + test;
+			// func.logAlert(logMsg, "error");
+			// return;
+		// }
+		if (isPushEnabled) {
+			unsubscribe();
+		} else {
+			subscribe();
+		}
+		
+	};//end event
+*/
+
+}//end defineEvents()
+
+
+/*
 function registerServiceWorker() {
-	
+
 	logMsg = "-- navigator.serviceWorker registration in progress.";
 	func.logAlert(logMsg, "info");
 	
-	window.addEventListener('load', function() {
+	//window.addEventListener('load', function() {
 		navigator.serviceWorker.register("sw.js").then(function(reg) {
 			logMsg = "-- navigator.serviceWorker registration succeeded. Scope is " + reg.scope;
 func.logAlert(logMsg, "success");
@@ -104,8 +216,7 @@ logMsg="Service worker active";
 func.logAlert( logMsg, "info" );
 			}
 			
-			support = true;
-			_getListCaches();
+			initialiseState();
 		}, 
 
 		function(err) {
@@ -120,410 +231,99 @@ func.logAlert(logMsg, "error");
 console.log(error);
 		});
 	 
-	});//end event
+	//});//end event
 
 }//end registerServiceWorker()
+*/
 
-function defineEvents(){
+/*
+//https://devhub.io/repos/eveness-web-push-api
+function initialiseState() {
+	// Проверяем создание уведомлений при помощи Service Worker API
+	  if ( !("showNotification" in ServiceWorkerRegistration.prototype) ) {
+console.warn('Уведомления не поддерживаются браузером.');
+		return;
+	}
 
-	window.addEventListener("offline", function(e) {
-		logMsg = "navigator.onLine: " + navigator.onLine;
-		func.logAlert(logMsg, "danger");
-	});
-	window.addEventListener("online", function(e) {
-		logMsg = "navigator.onLine: " + navigator.onLine;
-		func.logAlert(logMsg, "success");
-	});
+	// Проверяем не запретил ли пользователь прием уведомлений
+	if( Notification.permission === "denied" ) {  
+console.warn('Пользователь запретил прием уведомлений.');  
+		return;  
+	}
 
-	var btn_clear_log = document.querySelector("#btn-clear-log");
-	btn_clear_log.onclick = function(){
-		log.innerHTML = "";
-	};
+	// Проверяем поддержку Push API
+	if ( !("PushManager" in window) ) {  
+console.warn("Push-сообщения не поддерживаются браузером.");  
+		return;
+	}
+
+  // Проверяем зарегистрирован ли наш сервис-воркер
+	navigator.serviceWorker.ready.then(function(serviceWorkerRegistration) {  
 	
-	var cacheNameField = document.querySelector("#cache-name");
-	var cacheKeyField = document.querySelector("#cache-key");
-	
-	var btn_list_cache_keys = document.querySelector("#btn-list-cache-keys");
-	btn_list_cache_keys.onclick = function(e){
-//console.log(e);
-		if(!support){
-			return false;
-		}
-		
-		var cacheName = cacheNameField.value;
-//console.log(cacheName);
-		if( !cacheName || cacheName.length===0 ){
-logMsg="<b>Object cache name</b> is empty....";
-func.logAlert( logMsg, "warning" );
-			return false;
-		}
+		// Проверяем наличие подписки  
+		serviceWorkerRegistration.pushManager.getSubscription().then(
+			function(subscription) {  
+				// Делаем нашу кнопку активной
+				var pushButton = document.querySelector("#btn-push-subscribe");
+				pushButton.disabled = false;
 
-		caches.has( cacheName ).then(function(res){
-//console.log(res);	
-			if( !res){
-logMsg="Cache object " +cacheName+ " not found....";
-func.logAlert( logMsg, "warning" );
-				return false;
-			} else {
-				_getKeys( cacheName );
-			}
-		});
-	}//end event
-
-	var btn_list_caches = document.querySelector("#btn-list-caches");
-	btn_list_caches.onclick = function(e){
-		_getListCaches();
-	}//end event
-
-	var btn_delete_cache = document.querySelector("#btn-delete-cache");
-	btn_delete_cache.onclick = function(e){
-		if(!support){
-			return false;
-		}
-		var cacheName = cacheNameField.value;
-//console.log(cacheName);
-		if( !cacheName || cacheName.length===0 ){
-logMsg="<b>Object cache name</b> is empty....";
-func.logAlert( logMsg, "warning" );
-			return false;
-		}
-		caches.delete( cacheName ).then( function( res ){
-//console.log(res);
-			if(res){
-logMsg="Cache object " +cacheName+ " was removed....";
-func.logAlert( logMsg, "success" );
-				_getListCaches();
-			} else {
-logMsg="Cache object " +cacheName+ " not found....";
-func.logAlert( logMsg, "warning" );
-			}
-		},
-		function(err) {
-console.log(err);
-		});
-
-	}//end event
-
-
-	var btn_add_all_cache = document.querySelector("#btn-add-all-cache");
-	btn_add_all_cache.onclick = function(e){
-		if(!support){
-			return false;
-		}
-		var cacheName = cacheNameField.value;
-//console.log(cacheName);
-		if( !cacheName || cacheName.length===0 ){
-logMsg="<b>Object cache name</b> is empty....";
-func.logAlert( logMsg, "warning" );
-			return false;
-		}
-		caches.open(cacheName).then(function( cache ){// add all caching resource URLs
-		
-			cache.addAll( FILES_TO_CACHE ).then(function(){
-logMsg="Pre-caching offline recources: " + FILES_TO_CACHE.toString();
-func.logAlert( logMsg, "success" );
-console.log(FILES_TO_CACHE.toString() );
-				_getKeys( cacheName );
-			});
-			//return _cache;
-		});
-		
-	}//end event
-
-
-	var btn_delete_key = document.querySelector("#btn-delete-key");
-	btn_delete_key.onclick = function(e){
-		if(!support){
-			return false;
-		}
-		var cacheName = cacheNameField.value;
-//console.log(cacheName);
-		if( !cacheName || cacheName.length===0 ){
-logMsg="<b>Object cache name</b> is empty....";
-func.logAlert( logMsg, "warning" );
-			return false;
-		}
-		
-		//var cacheKey = "css/bootstrap335.min.css";
-		var cacheKey = cacheKeyField.value;
-//console.log(cacheKey);
-		if( !cacheKey || cacheKey.length===0 ){
-logMsg="<b>cache key</b> is empty....";
-func.logAlert( logMsg, "warning" );
-			return false;
-		}
-
-		caches.open( cacheName ).then(function( cache ){
-			cache.delete( cacheKey ).then(function( res ){
-				if(res){
-logMsg=cacheKey + " was removed....";
-func.logAlert( logMsg, "success" );
-				} else {
-logMsg=cacheKey + " not found....";
-func.logAlert( logMsg, "warning" );
+				if( !subscription ) {// Если пользователь не подписан
+					return;
 				}
-				
-			});
+
+				// Отсылаем серверу данные о подписчике
+				sendSubscriptionToServer( subscription );
+
+				// Меняем состояние кнопки
+				pushButton.textContent = "unsubscribe";  
+				isPushEnabled = true;  
+		  })  
+		.catch( function(err) {  
+console.warn('Ошибка при получении данных о подписчике.', err);
 		});
-	}//end event
+	  
+	});  
 
+};//end initialiseState()
+*/
 
-	var btn_match_key = document.querySelector("#btn-match-key");
-	btn_match_key.onclick = function(e){
-		if(!support){
-			return false;
-		}
-		var cacheName = cacheNameField.value;
-//console.log(cacheName);
-		if( !cacheName || cacheName.length===0 ){
-logMsg="<b>Object cache name</b> is empty....";
-func.logAlert( logMsg, "warning" );
-			return false;
-		}
+/*
+//https://devhub.io/repos/eveness-web-push-api
+function subscribe() {
+	// Блокируем кнопку на время запроса 
+	// разрешения отправки уведомлений
+	var pushButton = document.querySelector("#btn-push-subscribe");
+	pushButton.disabled = true;
+
+	navigator.serviceWorker.ready.then( function(serviceWorkerRegistration){
 		
-		var cacheKey = cacheKeyField.value;
-//console.log(cacheKey);
-		if( !cacheKey || cacheKey.length===0 ){
-logMsg="<b>cache key</b> is empty....";
-func.logAlert( logMsg, "warning" );
-			return false;
-		}
+		serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true}).then( 
+			function(subscription) {
+				// Подписка осуществлена
+				isPushEnabled = true;
+				pushButton.textContent = "unsubscribe";
+				pushButton.disabled = false;
 
-		caches.open( cacheName ).then(function( cache ){
-			cache.match( cacheKey ).then(function( response ){
-console.log(response);				
-				if( response ){
-logMsg=cacheKey + " was cached...";
-func.logAlert( logMsg, "success" );
-				} else {
-logMsg=cacheKey + " not found in cache....";
-func.logAlert( logMsg, "warning" );
-				}
-				
-			});
-		});
-	}//end event
-
-
-	var btn_addKey = document.querySelector("#btn-add-key");
-	btn_addKey.onclick = function(e){
-		if(!support){
-			return false;
-		}
-		var cacheName = cacheNameField.value;
-//console.log(cacheName);
-		if( !cacheName || cacheName.length===0 ){
-logMsg="<b>Object cache name</b> is empty....";
-func.logAlert( logMsg, "warning" );
-			return false;
-		}
-		
-		var url = cacheKeyField.value;
-//console.log(cacheKey);
-		if( !url || url.length===0 ){
-logMsg="<b>URL</b> is empty (field cache key)....";
-func.logAlert( logMsg, "warning" );
-			return false;
-		}
-
-		caches.open( cacheName ).then(function( cache ){
-			cache.add( url ).then(function( response ) {//https://developer.mozilla.org/ru/docs/Web/API/Cache/add			
-console.log( response );
-logMsg="<b>URL " +url+ "</b> loaded and added to cache " +cacheName;
-func.logAlert( logMsg, "success" );
-			});
-		});
-	}//end event
-
-
-	var btn_test = document.querySelector("#btn-test");
-	btn_test.onclick = function(e){
-		if(!support){
-			return false;
-		}
-		var cacheName = cacheNameField.value;
-//console.log(cacheName);
-		if( !cacheName || cacheName.length===0 ){
-logMsg="<b>Object cache name</b> is empty....";
-func.logAlert( logMsg, "warning" );
-			return false;
-		}
-		
-		cacheKeyField.value = "pages/star-wars-logo_.jpg";//url for load image
-		var key = "pages/star-wars-logo.jpg";//cache image under different name
-		
-		var url = cacheKeyField.value;
-//console.log(url);
-
-		caches.open( cacheName ).then(function( cache ){
-			
-			fetch( url ).then(function (response){
-console.log( response );
-				if (!response.ok) {
-					throw new TypeError('bad response status');
-				} else {
-logMsg="Image by url "+url+" cached under name " + key+", reload page and see image....";
-func.log( "<p class='alert alert-success'>"+logMsg+"</p>", "info" );
-				}
-				return cache.put( key, response);
-			})				
-
-		});
-	}//end event
-
-
-
-	btn_swList.onclick = function(e){
-		navigator.serviceWorker.getRegistrations().then(function(registrations) {
-console.log( registrations );
-			_listSW( registrations );
-		})
-	}//end event
-
-	btn_swUnReg.onclick = function(e){
-		navigator.serviceWorker.getRegistrations().then(function(registrations) {
-console.log( registrations );
-
-			var url = field_swUrl.value;
-			if( !url || url.length===0 ){
-logMsg="<b>service worker URL</b> is empty...";
-func.logAlert( logMsg, "warning" );
-				return false;
-			}
-
-			var result = false;
-			//for(let registration of registrations) {
-			for(var n=0; n < registrations.length; n++) {
-				 var registration = registrations[n];
-				
-//console.log( registration.active.scriptURL, url, registration.active.scriptURL === url);
-				if( registration.active.scriptURL === url ){
-					result = true;
-					registration.unregister().then( function(res) {
-console.log(res);						
-						if( res){
-logMsg="service worker by URL:<b> "+registration.active.scriptURL+"</b> was unregister...";
-func.logAlert( logMsg, "success" );
-						} else {
-logMsg="service worker by URL:<b> "+registration.active.scriptURL+"</b> was NOT unregister...";
-func.logAlert( logMsg, "error" );
-						}
-						
-					});
-					break;
-				}
-			}//next
-			
-			if(!result){
-logMsg="service worker by URL:<b>"+url+"</b> NOT found...";
-func.logAlert( logMsg, "error" );
-			}
-
-		});
-	}//end event
-
-	btn_swUpd.onclick = function(e){
-		navigator.serviceWorker.getRegistrations().then(function(registrations) {
-console.log( registrations );
-			var url = field_swUrl.value;
-			if( !url || url.length===0 ){
-logMsg="<b>service worker URL</b> is empty...";
-func.logAlert( logMsg, "warning" );
-				return false;
-			}
-
-			var result = false;
-			//for(let registration of registrations) {
-			for(var n=0; n < registrations.length; n++) {
-				 var registration = registrations[n];
-				
-//console.log( registration.active.scriptURL, url, registration.active.scriptURL === url);
-				if( registration.active.scriptURL === url ){
-					result = true;
-					registration.update().then( function(res) {
-console.log(res);						
-logMsg="service worker by URL:<b> "+registration.active.scriptURL+"</b> was updated...";
-func.logAlert( logMsg, "success" );
-					});
-					break;
-				}
-			}//next
-			
-			if(!result){
-logMsg="service worker by URL:<b>"+url+"</b> NOT found...";
-func.logAlert( logMsg, "error" );
-			}
-
-		})
-	}//end event
-
-
-}//end defineEvents()
-
-function _getListCaches(){
-		if(!support){
-			return false;
-		}
-
-		caches.keys().then( function(keyList) {
-console.log( keyList);
-			if( keyList.length > 0){
-func.log("<h4>List cache objects</h4>");
-				var html = "<ul class='list-unstyled'>{{list}}</ul>";
-				var listHtml = "";
-				for( var n = 0; n < keyList.length; n++){
-					listHtml += "<li class='list-group-item'>" + keyList[n] + "</li>";					
-				}//next
-				html = html.replace("{{list}}", listHtml);
-func.log(html);
-
-				var cacheNameField = document.querySelector("#cache-name");
-				cacheNameField.value = keyList[0];
-
-			} else {
-logMsg="not found cache objects...";
-func.logAlert( logMsg, "warning" );
-			}
-			
-		});
-}//end _getListCaches()		
-
-function _getKeys( cacheName ){
-	caches.open( cacheName ).then( function(cache) {
-//console.log("TEST:", cache);	
-		cache.keys().then( function(keyList) {
-				if( keyList.length > 0){
-console.log("CACHE key list:", keyList);
-func.log("<h4>Key list, cache object <b>"+cacheName+"</b></h4>");
-						var html = "<ol class='list-unstyled'>{{list}}</ol>";
-						var listHtml = "";
-						for( var n = 0; n < keyList.length; n++){
-							listHtml += "<li class='list-group-item'>" + keyList[n]["url"] + "</li>";
-						}//next
-						html = html.replace("{{list}}", listHtml);
-func.log(html);
-				} else {
-logMsg="no keys found in object cache " + cacheName;
-func.logAlert( logMsg, "warning" );
-				}
-			});
+				// В этой функции необходимо регистрировать подписчиков
+				// на стороне сервера, используя subscription.endpoint
+				return sendSubscriptionToServer( subscription );
+			})  
+			.catch(function(err) {  
+				if (Notification.permission === "denied") {  
+				  // Если пользователь запретил присылать уведомления,
+				  // то изменить это он может лишь вручную 
+				  // в настройках браузера для сайта
+console.warn('Пользователь запретил присылать уведомления');
+					pushButton.disabled = true;  
+				} else {  
+				  // Отлавливаем другие возможные проблемы -
+				  // потеря связи, отсутствие gcm_sender_id и прочее
+console.error('Невожможно подписаться, ошибка: ', err);
+					pushButton.disabled = false;
+					pushButton.textContent = "subscribe";
+				}  
+			});  
 	});
-}//end _getKeys()
-
-
-function _listSW( registrations ){
-func.log("<h4>Servise workers list</h4>");
-	var html = "<div class='panel panel-primary'>{{list}}</div>";
-	var listHtml = "";
-	 for(var n=0; n < registrations.length; n++) {
-		 var registration = registrations[n];
-		var _scopeHtml = "<p><small>scope:</small> " + registration.scope + "</p>";
-		var _stateHtml = "<p><small>state:</small> " + registration.active.state + "</p>";
-		var _urlHtml = "<p><small>scriptURL:</small> " + registration.active.scriptURL + "</p>";
-		listHtml += "<div class='panel-body'>" + _scopeHtml + _stateHtml + _urlHtml+"</div>";
-	}//next
-	html = html.replace("{{list}}", listHtml);
-func.log(html);
-	
-}//end _listSW()
-
+	  
+};//subscribe()
+*/
